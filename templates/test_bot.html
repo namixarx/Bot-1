@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}Test Bot - {{ bot.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+<div class="header">
+        <div style="display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-sm);">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary btn-small">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+            <h1 style="margin: 0;">Test Bot - {{ bot.name }}</h1>
+        </div>
+        <p>Test your bot's responses by sending sample messages. See how your bot will react to different inputs.</p>
+</div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg); margin-bottom: var(--spacing-lg);">
+        <!-- Test Interface -->
+<div class="card">
+            <div class="card-header">
+                <i class="fas fa-vial" style="margin-right: 0.5rem;"></i>Send Test Message
+            </div>
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <div class="form-group">
+                    <label>
+                        <i class="fas fa-comment" style="margin-right: 0.5rem; color: var(--purple);"></i>
+                        Test Message
+                    </label>
+            <input type="text" name="test_message" class="form-control" 
+                           placeholder="Type a message to test (e.g., 'hello', 'help')..." required>
+                    <small>Enter a message that might trigger one of your bot's responses.</small>
+        </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-paper-plane"></i> Send Test
+                </button>
+    </form>
+</div>
+
+        <!-- Bot Status -->
+<div class="card">
+            <div class="card-header">
+                <i class="fas fa-info-circle" style="margin-right: 0.5rem;"></i>Bot Configuration
+            </div>
+            <div style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--spacing-md); background: var(--bg-glass); border-radius: var(--radius-md);">
+                    <div style="display: flex; align-items: center; gap: var(--spacing-sm);">
+                        <i class="fas fa-power-off" style="color: var(--purple);"></i>
+                        <span style="font-weight: 600;">Status</span>
+                    </div>
+           <span class="badge {% if bot.is_active %}badge-success{% else %}badge-danger{% endif %}">
+                        <i class="fas fa-{% if bot.is_active %}check{% else %}times{% endif %}"></i>
+               {% if bot.is_active %}Active{% else %}Inactive{% endif %}
+           </span>
+    </div>
+    
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--spacing-md); background: var(--bg-glass); border-radius: var(--radius-md);">
+                    <div style="display: flex; align-items: center; gap: var(--spacing-sm);">
+                        <i class="fas fa-comments" style="color: var(--cyan);"></i>
+                        <span style="font-weight: 600;">Messages</span>
+                    </div>
+                    <span style="font-size: 1.25rem; font-weight: 700; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                        {{ messages_count }}
+                    </span>
+    </div>
+    
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--spacing-md); background: var(--bg-glass); border-radius: var(--radius-md);">
+                    <div style="display: flex; align-items: center; gap: var(--spacing-sm);">
+                        <i class="fas fa-keyboard" style="color: var(--emerald);"></i>
+                        <span style="font-weight: 600;">Buttons</span>
+                    </div>
+                    <span style="font-size: 1.25rem; font-weight: 700; background: var(--gradient-accent); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                        {{ buttons_count }}
+                    </span>
+                </div>
+    </div>
+    
+    {% if messages_count == 0 and buttons_count == 0 %}
+            <div class="alert alert-warning" style="margin-top: var(--spacing-md);">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Note:</strong> This bot has no messages or buttons configured yet. 
+                <a href="{{ url_for('manage_messages', bot_id=bot.id) }}" style="color: inherit; text-decoration: underline;">Add messages</a> or 
+                <a href="{{ url_for('manage_buttons', bot_id=bot.id) }}" style="color: inherit; text-decoration: underline;">add buttons</a> to test responses.
+    </div>
+    {% endif %}
+        </div>
+</div>
+
+{% if messages or buttons %}
+<div class="card">
+        <div class="card-header">
+            <i class="fas fa-list-ul" style="margin-right: 0.5rem;"></i>Available Triggers
+        </div>
+        <p style="color: var(--text-secondary); margin-bottom: var(--spacing-lg);">
+            Type a message containing any of these triggers to test your bot's responses.
+        </p>
+    
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg);">
+    {% if buttons %}
+            <div>
+                <h4 style="font-size: 1.1rem; font-weight: 700; margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: var(--spacing-sm);">
+                    <i class="fas fa-keyboard" style="color: var(--purple);"></i>
+                    Button Triggers
+                </h4>
+                <div style="display: flex; flex-direction: column; gap: var(--spacing-sm);">
+            {% for button in buttons %}
+                    <div style="padding: var(--spacing-md); background: var(--bg-glass); border-radius: var(--radius-md); border-left: 3px solid var(--purple); transition: all var(--transition-base);">
+                        <div style="display: flex; align-items: center; gap: var(--spacing-sm);">
+                            <i class="fas fa-circle" style="font-size: 0.5rem; color: var(--purple);"></i>
+                            <strong style="background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                                {{ button.button_text }}
+                            </strong>
+                        </div>
+                    </div>
+            {% endfor %}
+                </div>
+    </div>
+    {% endif %}
+    
+    {% if messages %}
+    <div>
+                <h4 style="font-size: 1.1rem; font-weight: 700; margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: var(--spacing-sm);">
+                    <i class="fas fa-bolt" style="color: var(--cyan);"></i>
+                    Message Triggers
+                </h4>
+                <div style="display: flex; flex-direction: column; gap: var(--spacing-sm);">
+            {% for message in messages %}
+                    <div style="padding: var(--spacing-md); background: var(--bg-glass); border-radius: var(--radius-md); border-left: 3px solid var(--cyan); transition: all var(--transition-base);">
+                        <div style="display: flex; align-items: center; gap: var(--spacing-sm);">
+                            <i class="fas fa-circle" style="font-size: 0.5rem; color: var(--cyan);"></i>
+                            <strong style="background: var(--gradient-secondary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                                {{ message.trigger_text }}
+                            </strong>
+                        </div>
+                    </div>
+            {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="alert alert-info" style="margin-top: var(--spacing-lg);">
+            <i class="fas fa-info-circle"></i>
+            <strong>Note:</strong> Matching is case-insensitive and uses substring matching. Your test message needs to contain the trigger text.
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+@media (max-width: 768px) {
+    .container > div[style*="grid-template-columns: 1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+.card > div[style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 1024px) {
+    .card > div[style*="grid-template-columns: 1fr"] {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+</style>
+{% endblock %}

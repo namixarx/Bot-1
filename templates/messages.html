@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Messages - {{ bot.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+<div class="header">
+        <div style="display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-sm);">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary btn-small">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+            <h1 style="margin: 0;">Manage Messages - {{ bot.name }}</h1>
+        </div>
+        <p>Configure auto-reply messages that trigger when users send specific text to your bot.</p>
+</div>
+
+<div class="card">
+        <div class="card-header">
+            <i class="fas fa-plus-circle" style="margin-right: 0.5rem;"></i>Add New Auto-Reply Message
+        </div>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        
+        <div class="form-group">
+                <label>
+                    <i class="fas fa-bolt" style="margin-right: 0.5rem; color: var(--purple);"></i>
+                    {{ form.trigger_text.label.text }}
+                </label>
+                {{ form.trigger_text(class="form-control", placeholder="Text that triggers this response (e.g., 'hello', 'help')") }}
+            {% if form.trigger_text.errors %}
+                    <div class="error">
+                        <i class="fas fa-exclamation-circle"></i>
+                    {% for error in form.trigger_text.errors %}{{ error }}{% endfor %}
+                </div>
+            {% endif %}
+                <small>When a user sends a message containing this text, the bot will respond automatically.</small>
+        </div>
+
+        <div class="form-group">
+                <label>
+                    <i class="fas fa-comment-dots" style="margin-right: 0.5rem; color: var(--purple);"></i>
+                    {{ form.response_text.label.text }}
+                </label>
+                {{ form.response_text(class="form-control", rows="4", placeholder="Response message that the bot will send") }}
+            {% if form.response_text.errors %}
+                    <div class="error">
+                        <i class="fas fa-exclamation-circle"></i>
+                    {% for error in form.response_text.errors %}{{ error }}{% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add Message
+            </button>
+    </form>
+</div>
+
+<div class="card">
+        <div class="card-header">
+            <i class="fas fa-list" style="margin-right: 0.5rem;"></i>Existing Messages
+            {% if messages %}
+            <span class="badge badge-info" style="margin-left: var(--spacing-sm);">{{ messages|length }} configured</span>
+            {% endif %}
+        </div>
+    {% if messages %}
+            <div style="overflow-x: auto;">
+        <table class="table">
+            <thead>
+                <tr>
+                            <th><i class="fas fa-bolt"></i> Trigger Text</th>
+                            <th><i class="fas fa-comment"></i> Response Text</th>
+                            <th><i class="fas fa-cog"></i> Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for message in messages %}
+                <tr>
+                            <td>
+                                <strong style="background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                                    {{ message.trigger_text }}
+                                </strong>
+                            </td>
+                            <td>
+                                <div style="max-width: 400px;">
+                                    {{ message.response_text[:100] }}{% if message.response_text|length > 100 %}...{% endif %}
+                                </div>
+                            </td>
+                    <td>
+                        <form method="POST" action="{{ url_for('delete_message', message_id=message.id) }}" 
+                              onsubmit="return confirm('Are you sure you want to delete this message?');" 
+                              style="display: inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                    <button type="submit" class="btn btn-danger btn-small">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+            </div>
+    {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <h3 style="font-size: 1.25rem; margin-bottom: var(--spacing-sm); color: var(--text-secondary);">
+                    No Messages Configured
+                </h3>
+                <p style="color: var(--text-muted);">
+                    Start by adding your first auto-reply message above.
+                </p>
+            </div>
+    {% endif %}
+    </div>
+</div>
+
+<style>
+.form-group .error {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: var(--spacing-xs);
+}
+</style>
+{% endblock %}

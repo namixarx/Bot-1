@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+
+{% block title %}Login / Register - Telegram Bot Panel{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-box">
+        <div style="text-align: center; margin-bottom: var(--spacing-xl);">
+            <div style="width: 80px; height: 80px; margin: 0 auto var(--spacing-md); border-radius: 20px; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; box-shadow: var(--shadow-glow);">
+                <i class="fas fa-robot"></i>
+            </div>
+        <h2>Telegram Bot Panel</h2>
+            <p style="color: var(--text-secondary); margin-top: var(--spacing-sm);">Manage your bots with ease</p>
+        </div>
+        
+        <div class="auth-tabs">
+            <button class="auth-tab {% if is_login %}active{% endif %}" onclick="showLogin(event)">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+            <button class="auth-tab {% if not is_login %}active{% endif %}" onclick="showRegister(event)">
+                <i class="fas fa-user-plus"></i> Register
+            </button>
+        </div>
+
+        <!-- Login Form -->
+        <div id="login-form" style="display: {% if is_login %}block{% else %}none{% endif %}; animation: fadeIn 0.3s ease;">
+            <form method="POST" action="{{ url_for('login') }}">
+                {% if is_login %}{{ form.hidden_tag() }}{% else %}{{ login_form.hidden_tag() }}{% endif %}
+                
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-user" style="margin-right: 0.5rem; color: var(--purple);"></i>
+                        {{ form.username.label.text }}
+                    </label>
+                    {{ form.username(class="form-control", placeholder="Enter your username") }}
+                    {% if form.username.errors %}
+                        <div class="error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {% for error in form.username.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-lock" style="margin-right: 0.5rem; color: var(--purple);"></i>
+                        {{ form.password.label.text }}
+                    </label>
+                    {{ form.password(class="form-control", placeholder="Enter your password") }}
+                    {% if form.password.errors %}
+                        <div class="error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {% for error in form.password.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: var(--spacing-md);">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </form>
+        </div>
+
+        <!-- Register Form -->
+        <div id="register-form" style="display: {% if not is_login %}block{% else %}none{% endif %}; animation: fadeIn 0.3s ease;">
+            <form method="POST" action="{{ url_for('register') }}">
+                {% if is_login %}{{ register_form.hidden_tag() }}{% else %}{{ form.hidden_tag() }}{% endif %}
+                
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-user" style="margin-right: 0.5rem; color: var(--purple);"></i>
+                        {% if is_login %}{{ register_form.first_name.label.text }}{% else %}{{ form.first_name.label.text }}{% endif %}
+                    </label>
+                    {% if is_login %}{{ register_form.first_name(class="form-control", placeholder="Enter your first name") }}{% else %}{{ form.first_name(class="form-control", placeholder="Enter your first name") }}{% endif %}
+                    {% if is_login and register_form.first_name.errors %}
+                        <div class="error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {% for error in register_form.first_name.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% elif not is_login and form.first_name.errors %}
+                        <div class="error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {% for error in form.first_name.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-user" style="margin-right: 0.5rem; color: var(--purple);"></i>
+                        {% if is_login %}{{ register_form.last_name.label.text }}{% else %}{{ form.last_name.label.text }}{% endif %}
+                    </label>
+                    {% if is_login %}{{ register_form.last_name(class="form-control", placeholder="Enter your last name") }}{% else %}{{ form.last_name(class="form-control", placeholder="Enter your last name") }}{% endif %}
+                    {% if is_login and register_form.last_name.errors %}
+                        <div class="error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {% for error in register_form.last_name.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% elif not is_login and form.last_name.errors %}
+                        <div class="error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {% for error in form.last_name.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-at" style="margin-right: 0.5rem; color: var(--purple);"></i>
+                        {% if is_login %}{{ register_form.username.label.text }}{% else %}{{ form.username.label.text }}{% endif %}
+                    </label>
+                    {% if is_login %}{{ register_form.username(class="form-control", placeholder="Choose a username") }}{% else %}{{ form.username(class="form-control", placeholder="Choose a username") }}{% endif %}
+                    {% if is_login and register_form.username.errors %}
+                        <div class="error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {% for error in register_form.username.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% elif not is_login and form.username.errors %}
+                        <div class="error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {% for error in form.username.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-lock" style="margin-right: 0.5rem; color: var(--purple);"></i>
+                        {% if is_login %}{{ register_form.password.label.text }}{% else %}{{ form.password.label.text }}{% endif %}
+                    </label>
+                    {% if is_login %}{{ register_form.password(class="form-control", placeholder="Create a password (min 6 characters)") }}{% else %}{{ form.password(class="form-control", placeholder="Create a password (min 6 characters)") }}{% endif %}
+                    {% if is_login and register_form.password.errors %}
+                        <div class="error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {% for error in register_form.password.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% elif not is_login and form.password.errors %}
+                        <div class="error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {% for error in form.password.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-lock" style="margin-right: 0.5rem; color: var(--purple);"></i>
+                        {% if is_login %}{{ register_form.repeat_password.label.text }}{% else %}{{ form.repeat_password.label.text }}{% endif %}
+                    </label>
+                    {% if is_login %}{{ register_form.repeat_password(class="form-control", placeholder="Confirm your password") }}{% else %}{{ form.repeat_password(class="form-control", placeholder="Confirm your password") }}{% endif %}
+                    {% if is_login and register_form.repeat_password.errors %}
+                        <div class="error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {% for error in register_form.repeat_password.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% elif not is_login and form.repeat_password.errors %}
+                        <div class="error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {% for error in form.repeat_password.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-key" style="margin-right: 0.5rem; color: var(--purple);"></i>
+                        {% if is_login %}{{ register_form.bot_token.label.text }}{% else %}{{ form.bot_token.label.text }}{% endif %}
+                    </label>
+                    {% if is_login %}{{ register_form.bot_token(class="form-control", placeholder="123456789:ABCdefGHIjklMNOpqrsTUVwxyz") }}{% else %}{{ form.bot_token(class="form-control", placeholder="123456789:ABCdefGHIjklMNOpqrsTUVwxyz") }}{% endif %}
+                    {% if is_login and register_form.bot_token.errors %}
+                        <div class="error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {% for error in register_form.bot_token.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% elif not is_login and form.bot_token.errors %}
+                        <div class="error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {% for error in form.bot_token.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                    <small>
+                        <i class="fas fa-info-circle" style="margin-right: 0.25rem;"></i>
+                        Get your bot token from <a href="https://t.me/BotFather" target="_blank" style="color: var(--cyan); text-decoration: none;">@BotFather</a> on Telegram
+                    </small>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: var(--spacing-md);">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.auth-tab i {
+    margin-right: 0.5rem;
+}
+
+.form-group .error {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: var(--spacing-xs);
+}
+
+.form-group small a:hover {
+    text-decoration: underline;
+}
+</style>
+
+<script>
+function showLogin(event) {
+    event.preventDefault();
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const tabs = document.querySelectorAll('.auth-tab');
+    
+    tabs.forEach(tab => tab.classList.remove('active'));
+    event.target.closest('.auth-tab').classList.add('active');
+    
+    registerForm.style.display = 'none';
+    loginForm.style.display = 'block';
+    loginForm.style.animation = 'fadeIn 0.3s ease';
+    
+    window.location.href = "{{ url_for('login') }}";
+}
+
+function showRegister(event) {
+    event.preventDefault();
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const tabs = document.querySelectorAll('.auth-tab');
+    
+    tabs.forEach(tab => tab.classList.remove('active'));
+    event.target.closest('.auth-tab').classList.add('active');
+    
+    loginForm.style.display = 'none';
+    registerForm.style.display = 'block';
+    registerForm.style.animation = 'fadeIn 0.3s ease';
+    
+    window.location.href = "{{ url_for('register') }}";
+}
+</script>
+{% endblock %}

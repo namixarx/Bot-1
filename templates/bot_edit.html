@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}{% if bot %}Edit Bot{% else %}Create Bot{% endif %} - Telegram Bot Panel{% endblock %}
+
+{% block content %}
+<div class="container">
+<div class="header">
+        <div style="display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-sm);">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary btn-small">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+            <h1 style="margin: 0;">{% if bot %}Edit Bot{% else %}Create New Bot{% endif %}</h1>
+        </div>
+        <p>{% if bot %}Update your bot's information and settings.{% else %}Create a new Telegram bot by providing the required information.{% endif %}</p>
+</div>
+
+<div class="form-container">
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        
+        <div class="form-group">
+                <label>
+                    <i class="fas fa-robot" style="margin-right: 0.5rem; color: var(--purple);"></i>
+                    {{ form.name.label.text }}
+                </label>
+                {{ form.name(class="form-control", placeholder="Enter bot name") }}
+            {% if form.name.errors %}
+                    <div class="error">
+                        <i class="fas fa-exclamation-circle"></i>
+                    {% for error in form.name.errors %}{{ error }}{% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+                <label>
+                    <i class="fas fa-align-left" style="margin-right: 0.5rem; color: var(--purple);"></i>
+                    {{ form.description.label.text }}
+                </label>
+                {{ form.description(class="form-control", rows="4", placeholder="Describe what your bot does (optional)") }}
+            {% if form.description.errors %}
+                    <div class="error">
+                        <i class="fas fa-exclamation-circle"></i>
+                    {% for error in form.description.errors %}{{ error }}{% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+                <label>
+                    <i class="fas fa-key" style="margin-right: 0.5rem; color: var(--purple);"></i>
+                    {{ form.token.label.text }}
+                </label>
+            {{ form.token(class="form-control", placeholder="123456789:ABCdefGHIjklMNOpqrsTUVwxyz") }}
+            {% if form.token.errors %}
+                    <div class="error">
+                        <i class="fas fa-exclamation-circle"></i>
+                    {% for error in form.token.errors %}{{ error }}{% endfor %}
+                </div>
+            {% endif %}
+                <small>
+                    <i class="fas fa-info-circle" style="margin-right: 0.25rem;"></i>
+                    Get your bot token from <a href="https://t.me/BotFather" target="_blank" style="color: var(--cyan); text-decoration: none;">@BotFather</a> on Telegram
+                </small>
+        </div>
+
+            <div style="display: flex; gap: var(--spacing-md); margin-top: var(--spacing-xl);">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-{% if bot %}save{% else %}plus{% endif %}"></i>
+                    {% if bot %}Update Bot{% else %}Create Bot{% endif %}
+                </button>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+        </div>
+    </form>
+    </div>
+</div>
+
+<style>
+.form-group .error {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: var(--spacing-xs);
+}
+
+.form-group small a:hover {
+    text-decoration: underline;
+}
+</style>
+{% endblock %}

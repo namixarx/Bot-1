@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Buttons - {{ bot.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+<div class="header">
+        <div style="display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-sm);">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary btn-small">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+            <h1 style="margin: 0;">Manage Buttons - {{ bot.name }}</h1>
+        </div>
+        <p>Configure interactive buttons that users can click to trigger specific responses from your bot.</p>
+</div>
+
+<div class="card">
+        <div class="card-header">
+            <i class="fas fa-plus-circle" style="margin-right: 0.5rem;"></i>Add New Button
+        </div>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        
+        <div class="form-group">
+                <label>
+                    <i class="fas fa-keyboard" style="margin-right: 0.5rem; color: var(--purple);"></i>
+                    {{ form.button_text.label.text }}
+                </label>
+                {{ form.button_text(class="form-control", placeholder="Button text (e.g., 'Get Started', 'Help')") }}
+            {% if form.button_text.errors %}
+                    <div class="error">
+                        <i class="fas fa-exclamation-circle"></i>
+                    {% for error in form.button_text.errors %}{{ error }}{% endfor %}
+                </div>
+            {% endif %}
+                <small>This text will appear on the button that users can click.</small>
+        </div>
+
+        <div class="form-group">
+                <label>
+                    <i class="fas fa-comment-dots" style="margin-right: 0.5rem; color: var(--purple);"></i>
+                    {{ form.response_text.label.text }}
+                </label>
+                {{ form.response_text(class="form-control", rows="4", placeholder="Response message when button is clicked") }}
+            {% if form.response_text.errors %}
+                    <div class="error">
+                        <i class="fas fa-exclamation-circle"></i>
+                    {% for error in form.response_text.errors %}{{ error }}{% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add Button
+            </button>
+    </form>
+</div>
+
+<div class="card">
+        <div class="card-header">
+            <i class="fas fa-list" style="margin-right: 0.5rem;"></i>Existing Buttons
+            {% if buttons %}
+            <span class="badge badge-info" style="margin-left: var(--spacing-sm);">{{ buttons|length }} configured</span>
+            {% endif %}
+        </div>
+    {% if buttons %}
+            <div style="overflow-x: auto;">
+        <table class="table">
+            <thead>
+                <tr>
+                            <th><i class="fas fa-keyboard"></i> Button Text</th>
+                            <th><i class="fas fa-comment"></i> Response Text</th>
+                            <th><i class="fas fa-cog"></i> Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for button in buttons %}
+                <tr>
+                            <td>
+                                <strong style="background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                                    {{ button.button_text }}
+                                </strong>
+                            </td>
+                            <td>
+                                <div style="max-width: 400px;">
+                                    {{ button.response_text[:100] }}{% if button.response_text|length > 100 %}...{% endif %}
+                                </div>
+                            </td>
+                    <td>
+                        <form method="POST" action="{{ url_for('delete_button', button_id=button.id) }}" 
+                              onsubmit="return confirm('Are you sure you want to delete this button?');" 
+                              style="display: inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                    <button type="submit" class="btn btn-danger btn-small">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+            </div>
+    {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-keyboard"></i>
+                </div>
+                <h3 style="font-size: 1.25rem; margin-bottom: var(--spacing-sm); color: var(--text-secondary);">
+                    No Buttons Configured
+                </h3>
+                <p style="color: var(--text-muted);">
+                    Start by adding your first button above.
+                </p>
+            </div>
+    {% endif %}
+    </div>
+</div>
+
+<style>
+.form-group .error {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: var(--spacing-xs);
+}
+</style>
+{% endblock %}

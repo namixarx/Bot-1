@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{% block title %}Telegram Bot Panel{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% if session.user_id %}
+    <!-- Top Navigation Bar -->
+    <nav class="top-nav">
+        <div class="top-nav-left">
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <a href="{{ url_for('dashboard') }}" class="logo">
+                <i class="fas fa-robot"></i>
+                <span>Bot Panel</span>
+            </a>
+        </div>
+        <div class="top-nav-right">
+            <div class="user-profile">
+                <div class="user-avatar">
+                    {{ session.username[0].upper() }}
+                </div>
+                <span class="user-name">{{ session.username }}</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">
+                    <span class="sidebar-menu-icon"><i class="fas fa-home"></i></span>
+                    <span class="sidebar-menu-text">Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('dashboard') }}#bots" class="{% if 'bot' in request.endpoint and request.endpoint != 'dashboard' %}active{% endif %}">
+                    <span class="sidebar-menu-icon"><i class="fas fa-robot"></i></span>
+                    <span class="sidebar-menu-text">My Bots</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('dashboard') }}#messages" class="{% if 'message' in request.endpoint or 'button' in request.endpoint %}active{% endif %}">
+                    <span class="sidebar-menu-icon"><i class="fas fa-comments"></i></span>
+                    <span class="sidebar-menu-text">Messages & Buttons</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('logout') }}">
+                    <span class="sidebar-menu-icon"><i class="fas fa-sign-out-alt"></i></span>
+                    <span class="sidebar-menu-text">Logout</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+    {% endif %}
+    
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'error' if category == 'error' else category }}">
+                    <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'error' %}exclamation-circle{% elif category == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+    
+    {% if session.user_id %}
+    </main>
+    {% endif %}
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
