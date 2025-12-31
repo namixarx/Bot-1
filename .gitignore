@@ -7,6 +7,7 @@ __pycache__/
 env/
 venv/
 ENV/
+# Note: venv/ is included but you may want to keep it for deployment
 build/
 develop-eggs/
 dist/
@@ -28,6 +29,10 @@ instance/
 *.db
 *.sqlite
 *.sqlite3
+
+# Logs
+logs/
+*.log
 
 # Environment variables
 .env

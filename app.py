@@ -10,6 +10,14 @@ import requests
 import threading
 from functools import wraps
 
+# Setup logging to file
+try:
+    from setup_logging import setup_logging
+    log_file_handle = setup_logging()
+except Exception as e:
+    print(f"Warning: Could not setup file logging: {e}")
+    log_file_handle = None
+
 app = Flask(__name__)
 app.config.from_object(Config)
 
